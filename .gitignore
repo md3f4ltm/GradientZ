@@ -1,0 +1,54 @@
+# Zig build artifacts
+zig-out/
+.zig-cache/
+zig-cache/
+
+# Compiled object files
+*.o
+*.obj
+*.a
+*.so
+*.dylib
+*.dll
+
+# Executable files
+*.exe
+
+# Debug files
+*.pdb
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+
+# Logs
+*.log
+
+# Python cache (for comparison scripts)
+__pycache__/
+*.pyc
+*.pyo
+
+# Node modules (if any JS tools are used)
+node_modules/
+
+# Backup files
+*.bak
+*.backup
+  

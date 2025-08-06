@@ -1,46 +1,54 @@
-//! By convention, main.zig is where your main function lives in the case that
-//! you are building an executable. If you are making a library, the convention
-//! is to delete this file and start with root.zig instead.
+const std = @import("std");
+const GradientZ = @import("GradientZ_lib");
 
 pub fn main() !void {
-    // Prints to stderr (it's a shortcut based on `std.io.getStdErr()`)
-    std.debug.print("All your {s} are belong to us.\n", .{"codebase"});
+    // Initialize the library
+    GradientZ.init();
 
-    // stdout is for the actual output of your application, for example if you
-    // are implementing gzip, then only the compressed bytes should be sent to
-    // stdout, not any debugging messages.
-    const stdout_file = std.io.getStdOut().writer();
-    var bw = std.io.bufferedWriter(stdout_file);
-    const stdout = bw.writer();
+    // Create allocator
+    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+    defer _ = gpa.deinit();
+    const allocator = gpa.allocator();
 
-    try stdout.print("Run `zig build test` to run the tests.\n", .{});
+    std.debug.print("=== GradientZ Tensor Library ===\n\n", .{});
 
-    try bw.flush(); // Don't forget to flush!
+    // Show library information
+    GradientZ.info();
+
+    std.debug.print("\n📚 Examples have been moved to the examples/ folder!\n", .{});
+    std.debug.print("Run them with:\n", .{});
+    std.debug.print("  zig build example-scalars      # 0D tensors (scalars)\n", .{});
+    std.debug.print("  zig build example-vectors      # 1D tensors (vectors)\n", .{});
+    std.debug.print("  zig build example-matrices     # 2D tensors (matrices)\n", .{});
+    std.debug.print("  zig build example-3d           # 3D tensors\n", .{});
+    std.debug.print("  zig build example-autograd     # Automatic differentiation\n", .{});
+    std.debug.print("  zig build example-mlp          # Multi-Layer Perceptron\n", .{});
+    std.debug.print("  zig build example-devices      # Device functionality\n", .{});
+    std.debug.print("  zig build example-training     # Training with gradient descent\n", .{});
+    std.debug.print("  zig build example              # PyTorch-like API example\n", .{});
+    std.debug.print("  zig build examples             # Run all examples\n", .{});
+
+    std.debug.print("\n🚀 Quick demo - Creating tensors:\n", .{});
+
+    // Quick demo of basic functionality
+    var zeros_tensor = try GradientZ.zeros(allocator, &.{ 2, 3 }, GradientZ.cpu());
+    defer zeros_tensor.deinit();
+
+    std.debug.print("Zeros tensor (2x3):\n", .{});
+    try zeros_tensor.print();
+
+    var ones_tensor = try GradientZ.ones(allocator, &.{ 2, 3 }, GradientZ.cpu());
+    defer ones_tensor.deinit();
+
+    std.debug.print("\nOnes tensor (2x3):\n", .{});
+    try ones_tensor.print();
+
+    // Basic arithmetic
+    var sum = try zeros_tensor.add(&ones_tensor);
+    defer sum.deinit();
+
+    std.debug.print("\nZeros + Ones:\n", .{});
+    try sum.print();
+
+    std.debug.print("\n✅ GradientZ library is working! Explore the examples to learn more.\n", .{});
 }
-
-test "simple test" {
-    var list = std.ArrayList(i32).init(std.testing.allocator);
-    defer list.deinit(); // Try commenting this out and see if zig detects the memory leak!
-    try list.append(42);
-    try std.testing.expectEqual(@as(i32, 42), list.pop());
-}
-
-test "use other module" {
-    try std.testing.expectEqual(@as(i32, 150), lib.add(100, 50));
-}
-
-test "fuzz example" {
-    const Context = struct {
-        fn testOne(context: @This(), input: []const u8) anyerror!void {
-            _ = context;
-            // Try passing `--fuzz` to `zig build test` and see if it manages to fail this test case!
-            try std.testing.expect(!std.mem.eql(u8, "canyoufindme", input));
-        }
-    };
-    try std.testing.fuzz(Context{}, Context.testOne, .{});
-}
-
-const std = @import("std");
-
-/// This imports the separate module containing `root.zig`. Take a look in `build.zig` for details.
-const lib = @import("GradientZ_lib");
